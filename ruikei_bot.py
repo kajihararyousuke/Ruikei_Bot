@@ -31,7 +31,7 @@ client = tweepy.Client(
 def get_openai_response(prompt):
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # または "gpt-3.5-turbo"
+            model="gpt-4o-mini",  # または "gpt-3.5-turbo"
             messages=[
                 {"role": "user", "content": prompt}
             ],
