@@ -1,5 +1,4 @@
 import tweepy
-import openai
 import os
 import logging
 import schedule
@@ -8,16 +7,17 @@ from datetime import datetime
 import pytz
 from dotenv import load_dotenv
 from config import BANNED_WORDS
+from openai import OpenAI
 
 load_dotenv()
 
 # ログ設定
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# OpenAI API キー設定
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# OpenAI クライアント初期化
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Twitter v2クライアント初期化
+# Twitter v2 クライアント初期化
 client = tweepy.Client(
     consumer_key=os.getenv('X_API_KEY'),
     consumer_secret=os.getenv('X_API_SECRET'),
@@ -30,7 +30,7 @@ client = tweepy.Client(
 # OpenAI API 呼び出し
 def get_openai_response(prompt):
     try:
-        response = openai.ChatCompletion.create(
+        response = openai_client.chat.completions.create(
             model="gpt-4o-mini",  # または "gpt-3.5-turbo"
             messages=[
                 {"role": "user", "content": prompt}
@@ -38,7 +38,7 @@ def get_openai_response(prompt):
             max_tokens=160,
             temperature=0.8
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         logging.error(f"OpenAI API 呼び出しエラー: {str(e)}")
         return None
